@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smartphone-Regeln</title>
+<style>
+  :root {
+    --bg: #f4f5f8;
+    --card: #ffffff;
+    --fg: #1d2230;
+    --muted: #677085;
+    --border: #e1e4eb;
+    --accent: #3b6fe0;
+    --on-accent: #fff;
+    --c-free: #2f9e5d;
+    --c-restricted: #f0b429;
+    --c-blocked: #d64545;
+    --c-night: #3f4a6e;
+    --on-free: #fff;
+    --on-restricted: #3a2a00;
+    --on-blocked: #fff;
+    --on-night: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151c;
+      --card: #1b1f2a;
+      --fg: #e8eaf0;
+      --muted: #9aa2b5;
+      --border: #2c3242;
+      --accent: #7aa2ff;
+      --on-accent: #10172a;
+      --c-free: #3bb26d;
+      --c-restricted: #e7b03a;
+      --c-blocked: #e05a5a;
+      --c-night: #56618a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --on-accent: #10172a;
+    --bg: #12151c;
+    --card: #1b1f2a;
+    --fg: #e8eaf0;
+    --muted: #9aa2b5;
+    --border: #2c3242;
+    --accent: #7aa2ff;
+    --c-free: #3bb26d;
+    --c-restricted: #e7b03a;
+    --c-blocked: #e05a5a;
+    --c-night: #56618a;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.45;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 1.6rem; margin: 0 0 2px; }
+  h2 { font-size: 1.1rem; margin: 0 0 14px; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 16px; padding: 4px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .tabs button {
+    flex: 1; border: none; background: none; color: var(--muted);
+    font: inherit; font-weight: 600; padding: 8px 4px; border-radius: 8px; cursor: pointer;
+  }
+  .tabs button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
+  .tabs button:not([aria-selected="true"]):hover { color: var(--fg); }
+  [role="tabpanel"][hidden] { display: none; }
+
+  /* Status */
+  .status { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border-radius: 10px;
+    font-weight: 700; font-size: 1.25rem;
+  }
+  .status-text { flex: 1 1 260px; }
+  .status-text p { margin: 4px 0; }
+  .muted { color: var(--muted); }
+
+  /* Controls */
+  .controls { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding-right: 46px; }
+  .ctl { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button {
+    border: 1px solid var(--border); background: var(--bg); color: var(--fg);
+    border-radius: 8px; padding: 6px 10px; font: inherit; cursor: pointer;
+    min-width: 34px; text-align: center; line-height: 1.2;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .seg button:disabled { opacity: .4; cursor: not-allowed; }
+  .switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+  .switch input { appearance: none; width: 44px; height: 24px; border-radius: 12px; background: var(--border); position: relative; cursor: pointer; margin: 0; transition: background .15s; }
+  .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .15s; }
+  .switch input:checked { background: var(--accent); }
+  .switch input:checked::after { left: 23px; }
+  .reset {
+    position: absolute; top: 0; right: 0; width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--fg);
+    font-size: 1.1rem; line-height: 1; cursor: pointer;
+  }
+  .reset:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Timeline */
+  .timeline { position: relative; }
+  .bracket-row { position: relative; height: 30px; }
+  .bracket {
+    position: absolute; bottom: 2px; height: 9px;
+    border: 2px solid var(--accent); border-bottom: none; border-radius: 4px 4px 0 0;
+  }
+  .bracket span {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    font-size: .72rem; font-weight: 600; color: var(--accent); white-space: nowrap;
+  }
+  .bar { position: relative; height: 54px; border-radius: 8px; overflow: hidden; display: flex; }
+  .bar.mini { height: 16px; border-radius: 4px; }
+  .zone {
+    position: absolute; top: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 600; text-align: center; line-height: 1.15;
+    padding: 0 2px; overflow: hidden;
+    border-right: 1px solid rgba(255,255,255,.35);
+  }
+  .z-free { background: var(--c-free); color: var(--on-free); }
+  .z-restricted { background: var(--c-restricted); color: var(--on-restricted); }
+  .z-blocked { background: var(--c-blocked); color: var(--on-blocked); }
+  .z-night { background: var(--c-night); color: var(--on-night); }
+  .now {
+    position: absolute; top: -6px; bottom: -6px; width: 3px; margin-left: -1.5px;
+    background: var(--fg); border-radius: 2px; pointer-events: none;
+  }
+  .now::before {
+    content: ""; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: var(--fg);
+  }
+  .bar-wrap { position: relative; }
+  .break {
+    position: absolute; top: -7px; bottom: -7px;
+    background: var(--card);
+    border-left: 2px solid var(--muted); border-right: 2px solid var(--muted);
+    transform: skewX(-18deg); pointer-events: none;
+  }
+  .bar.mini + .break { top: -3px; bottom: -3px; border-width: 1.5px; }
+  .school-mark {
+    position: absolute; top: -4px; bottom: -4px; width: 0; margin-left: -1px;
+    border-left: 2px dashed var(--fg); pointer-events: none;
+  }
+  .mark-row { position: relative; height: 24px; margin-top: 6px; font-size: .75rem; font-weight: 600; }
+  .mark-row.tall { height: 42px; }
+  .mlbl { position: absolute; top: 0; display: flex; align-items: flex-end; gap: 4px; white-space: nowrap; }
+  .mlbl span { line-height: 1; margin-bottom: -5px; }
+  .mlbl.l { margin-right: -1px; }
+  .mlbl.r { margin-left: -1px; }
+  .mlbl i { position: relative; width: 12px; height: 16px; border-bottom: 2px solid var(--fg); flex: none; }
+  .mlbl.l i { border-right: 2px solid var(--fg); border-bottom-right-radius: 3px; }
+  .mlbl.r i { border-left: 2px solid var(--fg); border-bottom-left-radius: 3px; }
+  .mlbl.low i { height: 34px; }
+  .mlbl i::after {
+    content: ""; position: absolute; top: -6px;
+    border: 5px solid transparent; border-top: none; border-bottom: 7px solid var(--fg);
+  }
+  .mlbl.l i::after { right: -6px; }
+  .mlbl.r i::after { left: -6px; }
+  .axis { position: relative; height: 20px; margin-top: 4px; font-size: .72rem; color: var(--muted); }
+  .axis span { position: absolute; transform: translateX(-50%); }
+  .axis span:last-child { transform: translateX(-100%); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; font-size: .85rem; }
+  .legend i, .plan i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
+
+  .plan { list-style: none; padding: 0; margin: 16px 0 0; }
+  .plan li {
+    display: grid; grid-template-columns: 22px 118px 1fr; gap: 6px; align-items: baseline;
+    padding: 7px 10px; border-radius: 8px;
+  }
+  .plan li.current { background: var(--bg); outline: 2px solid var(--accent); }
+  .plan .time { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .tag { display: inline-block; font-size: .72rem; color: var(--accent); border: 1px solid var(--accent); border-radius: 6px; padding: 0 5px; margin-left: 6px; white-space: nowrap; }
+
+  /* Week */
+  .week { display: grid; gap: 8px; }
+  .week-row { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; }
+  .week-row .day { font-weight: 600; }
+  .week-row.today .day { color: var(--accent); }
+  .week-row.today .bar { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .week-row .info { grid-column: 2; font-size: .75rem; color: var(--muted); margin-top: -4px; }
+
+  /* Rules */
+  .rules h3 { font-size: 1rem; margin: 14px 0 6px; }
+  .rules h3:first-child { margin-top: 0; }
+  .rules ul { margin: 0; padding-left: 20px; }
+  .rules li { margin: 3px 0; }
+  .callout {
+    border-left: 4px solid var(--accent); background: var(--bg);
+    padding: 10px 14px; border-radius: 0 8px 8px 0; margin-top: 12px; font-weight: 600;
+  }
+  .callout.warn { border-left-color: var(--c-blocked); }
+
+  @media (max-width: 560px) {
+    html { font-size: 14px; }
+    main { padding-top: 14px; }
+    .card { padding: 14px; }
+    h1 { font-size: 1.4rem; }
+    .badge { font-size: 1.1rem; }
+    .zone { font-size: .7rem; }
+    .plan li { grid-template-columns: 22px 92px 1fr; padding: 6px 4px; }
+    .controls { gap: 10px 20px; }
+    .ctl { flex-wrap: wrap; }
+    .seg { gap: 5px; }
+    .seg button { min-width: 30px; padding: 6px 0; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>📱 Smartphone-Regeln</h1>
+  <p class="sub" id="dateline"></p>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" type="button" data-tab="jetzt">Jetzt</button>
+    <button role="tab" type="button" data-tab="heute">Heute</button>
+    <button role="tab" type="button" data-tab="woche">Woche</button>
+    <button role="tab" type="button" data-tab="regeln">Regeln</button>
+  </nav>
+
+  <div role="tabpanel" id="tab-jetzt">
+  <section class="card" aria-live="polite">
+    <div class="status" id="status"></div>
+  </section>
+
+  </div>
+
+  <div role="tabpanel" id="tab-heute">
+  <section class="card">
+    <div class="timeline" id="today"></div>
+    <div class="legend">
+      <span><i class="z-free"></i>Alles erlaubt</span>
+      <span><i class="z-restricted"></i>Keine Spiele, keine Videos</span>
+      <span><i class="z-blocked"></i>Kein Handy</span>
+      <span><i class="z-night"></i>Nachtruhe (nur Telefonieren)</span>
+    </div>
+    <ul class="plan" id="plan"></ul>
+  </section>
+
+  <section class="card">
+    <div class="controls">
+      <label class="ctl">Heute Schule? <span class="switch"><input type="checkbox" id="schoolToday"></span></label>
+      <label class="ctl">Morgen Schule? <span class="switch"><input type="checkbox" id="schoolTomorrow"></span></label>
+      <div class="ctl">Schulstunden <div class="seg" id="lessons"></div></div>
+      <button class="reset" id="reset" type="button" title="Auf Standard für diesen Wochentag zurücksetzen" aria-label="Auf Standard für diesen Wochentag zurücksetzen">↺</button>
+    </div>
+  </section>
+
+  </div>
+
+  <div role="tabpanel" id="tab-woche">
+  <section class="card">
+    <div class="week" id="week"></div>
+  </section>
+
+  </div>
+
+  <div role="tabpanel" id="tab-regeln">
+  <section class="card rules">
+    <h3>Montag bis Freitag:</h3>
+    <ul>
+      <li>6:30 bis schulschluss: Keine Spiele, Keine Videos, Rest erlaubt</li>
+      <li>6:30 bis 1,5h nach Schulschluss: Kontingent von 1,5h Nutzung</li>
+      <li>1,5h nach Schulschluss bis 18:00: Keine Handynutzung</li>
+      <li>ab 18:00: Rest des 1,5h Kontingents kann verbraucht werden</li>
+    </ul>
+    <h3>Samstag und Sonntag;</h3>
+    <ul>
+      <li>6:30 bis 12:00 Keine Spiele, Keine Videos, Rest erlaubt</li>
+      <li>23:55 bis 6:30 Keine Nutzung (höchstens Telefon + Whatsapp Sprachanruf)</li>
+      <li>Nutzungszeit für den ganzen Tag: 2h. (Telefonie+ Whatsapp Sprachanruf zählt nicht)</li>
+    </ul>
+    <h3>Zusatzregeln</h3>
+    <ul>
+      <li>Unter der Woche: bis 20:30, danach Nachtruhe</li>
+      <li>Freitag: Nutzung bis 23:55 wie Samstags</li>
+      <li>Sonntag: Nutzung nur bis 20:30 wie in der Woche</li>
+      <li>Feiertag ist wie Samstag oder Sonntag, je nachdem, ob der nächste Tag ein Schultag ist</li>
+    </ul>
+    <div class="callout">📘 Schul-iPad: darf nur für die Schule genutzt werden</div>
+    <div class="callout warn">⚠️ Folgen bei Regelmissachtung: bis zu 1 Woche Handy gesperrt</div>
+  </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // Ende der jeweiligen Schulstunde (Minuten seit Mitternacht)
+  const LESSON_END = { 1: 8*60+45, 2: 9*60+35, 3: 10*60+35, 4: 11*60+25, 5: 12*60+30, 6: 13*60+20, 7: 14*60+20, 8: 15*60+10 };
+  // Vorbelegung Schulstunden je Wochentag (1 = Mo … 5 = Fr)
+  const DEFAULT_LESSONS = { 1: 5, 2: 8, 3: 6, 4: 5, 5: 6 };
+  const DAY_START = 6*60+30;           // 06:30
+  const NIGHT_SCHOOL_NEXT = 20*60+30;  // 20:30, wenn morgen Schule ist
+  const NIGHT_FREE_NEXT = 23*60+55;    // 23:55, wenn morgen keine Schule ist
+
+  const TYPES = {
+    free:       { cls: "z-free",       label: "Alles erlaubt",              short: "alles erlaubt", icon: "🟢" },
+    restricted: { cls: "z-restricted", label: "Keine Spiele, keine Videos", short: "ohne Spiele & Videos", icon: "🟡" },
+    blocked:    { cls: "z-blocked",    label: "Kein Handy",                 short: "kein Handy", icon: "🔴" },
+    night:      { cls: "z-night",      label: "Nachtruhe – nur Telefonieren", short: "Nacht", icon: "🌙" }
+  };
+  const DAY_NAMES = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+  const DAY_SHORT = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+
+  // ---------- Speicher (nur Komfort, darf fehlen) ----------
+  function load(key) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+  function remove(key) { try { localStorage.removeItem(key); } catch (e) {} }
+
+  // ---------- Hilfsfunktionen ----------
+  const pad = n => String(n).padStart(2, "0");
+  const fmt = m => { m = ((m % 1440) + 1440) % 1440; return pad(Math.floor(m / 60)) + ":" + pad(m % 60); };
+  function fmtDur(min) {
+    const h = Math.floor(min / 60), m = min % 60;
+    if (h && m) return h + " h " + m + " min";
+    if (h) return h + " h";
+    return m + " min";
+  }
+  const isoDate = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const defaultSchoolToday = dow => dow >= 1 && dow <= 5;
+  const defaultSchoolTomorrow = dow => dow >= 0 && dow <= 4;
+  const lessonsFor = dow => DEFAULT_LESSONS[dow] || 6;
+
+  // ---------- Regelmodell ----------
+  function buildDay(school, schoolTomorrow, lessons) {
+    const night = schoolTomorrow ? NIGHT_SCHOOL_NEXT : NIGHT_FREE_NEXT;
+    if (school) {
+      const end = LESSON_END[lessons];
+      const free = end + 90;
+      return {
+        school, schoolTomorrow, lessons, night, schoolEnd: end, budget: 90,
+        segments: [
+          { from: 0, to: DAY_START, type: "night" },
+          { from: DAY_START, to: end, type: "restricted" },
+          { from: end, to: free, type: "free" },
+          { from: free, to: 18*60, type: "blocked" },
+          { from: 18*60, to: night, type: "free" },
+          { from: night, to: 1440, type: "night" }
+        ],
+        ranges: [
+          { from: DAY_START, to: free, label: "1,5 h Kontingent" },
+          { from: 18*60, to: night, label: "Rest" }
+        ]
+      };
+    }
+    return {
+      school, schoolTomorrow, lessons, night, budget: 120,
+      segments: [
+        { from: 0, to: DAY_START, type: "night" },
+        { from: DAY_START, to: 12*60, type: "restricted" },
+        { from: 12*60, to: night, type: "free" },
+        { from: night, to: 1440, type: "night" }
+      ],
+      ranges: [ { from: DAY_START, to: night, label: "2 h Kontingent für den ganzen Tag" } ]
+    };
+  }
+  const inBudget = (day, seg) => day.ranges.some(r => seg.from >= r.from && seg.to <= r.to);
+
+  // ---------- Zustand ----------
+  let now, today, dow, state;
+
+  function loadState() {
+    now = new Date();
+    dow = now.getDay();
+    today = isoDate(now);
+    const stored = load("sr-day-" + today);
+    state = {
+      school: stored ? stored.school : defaultSchoolToday(dow),
+      tomorrow: stored ? stored.tomorrow : defaultSchoolTomorrow(dow),
+      lessons: stored && LESSON_END[stored.lessons] ? stored.lessons : lessonsFor(dow)
+    };
+  }
+  function saveState() {
+    save("sr-day-" + today, { school: state.school, tomorrow: state.tomorrow, lessons: state.lessons });
+  }
+
+  // ---------- Darstellung ----------
+  // Zeitachse mit Unterbrechung: 01:00–06:00 wird weggelassen
+  const CUT_FROM = 60, CUT_TO = 360, CUT_GAP = 3; // Breite der Bruchstelle in %
+  const VISIBLE = 1440 - (CUT_TO - CUT_FROM);
+  function pos(m) {
+    const scale = (100 - CUT_GAP) / VISIBLE;
+    if (m <= CUT_FROM) return m * scale;
+    if (m >= CUT_TO) return (m - (CUT_TO - CUT_FROM)) * scale + CUT_GAP;
+    return CUT_FROM * scale + (m - CUT_FROM) / (CUT_TO - CUT_FROM) * CUT_GAP;
+  }
+  const pct = m => pos(m) + "%";
+  const span = (a, b) => (pos(b) - pos(a)) + "%";
+
+  function renderBar(day, { mini = false, labels = true, brackets = true, nowMin = null } = {}) {
+    const wrap = document.createElement("div");
+    if (brackets) {
+      const row = document.createElement("div");
+      row.className = "bracket-row";
+      day.ranges.forEach(r => {
+        const b = document.createElement("div");
+        b.className = "bracket";
+        b.style.left = pct(r.from);
+        b.style.width = span(r.from, r.to);
+        b.innerHTML = "<span>" + r.label + "</span>";
+        row.appendChild(b);
+      });
+      wrap.appendChild(row);
+    }
+    const barWrap = document.createElement("div");
+    barWrap.className = "bar-wrap";
+    const bar = document.createElement("div");
+    bar.className = "bar" + (mini ? " mini" : "");
+    day.segments.forEach(s => {
+      const z = document.createElement("div");
+      const t = TYPES[s.type];
+      z.className = "zone " + t.cls;
+      z.style.left = pct(s.from);
+      z.style.width = span(s.from, s.to);
+      z.title = fmt(s.from) + "–" + (s.to === 1440 ? "24:00" : fmt(s.to)) + ": " + t.label;
+      if (labels && !(s.from < CUT_TO && s.to > CUT_FROM)) z.innerHTML = "<span>" + t.short + "</span>";
+      bar.appendChild(z);
+    });
+    barWrap.appendChild(bar);
+    const br = document.createElement("div");
+    br.className = "break";
+    br.style.left = pct(CUT_FROM);
+    br.style.width = span(CUT_FROM, CUT_TO);
+    br.title = "01:00–06:00 ausgelassen";
+    barWrap.appendChild(br);
+    if (!mini && day.school) {
+      const sm = document.createElement("div");
+      sm.className = "school-mark";
+      sm.style.left = pct(day.schoolEnd);
+      barWrap.appendChild(sm);
+    }
+    if (nowMin !== null) {
+      const n = document.createElement("div");
+      n.className = "now";
+      n.style.left = pct(nowMin);
+      barWrap.appendChild(n);
+    }
+    wrap.appendChild(barWrap);
+    if (!mini && day.school) {
+      const row = document.createElement("div");
+      row.className = "mark-row";
+      const endFree = day.schoolEnd + 90;
+      row.innerHTML =
+        '<div class="mlbl l" style="right:' + (100 - pos(day.schoolEnd)) + '%"><span>Schulschluss ' + fmt(day.schoolEnd) + "</span><i></i></div>" +
+        '<div class="mlbl r" style="left:' + pct(endFree) + '"><i></i><span>' + fmt(endFree) + " Ende</span></div>";
+      wrap.appendChild(row);
+    }
+    if (!mini) {
+      const axis = document.createElement("div");
+      axis.className = "axis";
+      for (let h = 6; h <= 24; h += 3) {
+        const s = document.createElement("span");
+        s.style.left = pct(h * 60);
+        s.textContent = pad(h) + ":00";
+        axis.appendChild(s);
+      }
+      wrap.appendChild(axis);
+    }
+    return wrap;
+  }
+
+  function currentInfo(day, m) {
+    const idx = day.segments.findIndex(s => m >= s.from && m < s.to);
+    const seg = day.segments[idx];
+    const last = idx === day.segments.length - 1;
+    const endMin = last ? 1440 + DAY_START : seg.to;
+    const next = last ? null : day.segments[idx + 1];
+    return { seg, idx, endMin, next, last };
+  }
+
+  function renderStatus(day, m) {
+    const { seg, endMin, last } = currentInfo(day, m);
+    const t = TYPES[seg.type];
+    const el = document.getElementById("status");
+    const endText = last ? "morgen 06:30" : fmt(endMin);
+    const budgetText = day.school
+      ? "Kontingent heute: <b>1,5 h</b> – nutzbar 06:30–" + fmt(day.schoolEnd + 90) + " und 18:00–" + fmt(day.night)
+      : "Kontingent heute: <b>2 h</b> für den ganzen Tag (Telefonieren zählt nicht)";
+    let extra = "";
+    if (seg.type === "blocked") extra = "<p>Ab 18:00 darf der Rest des Kontingents genutzt werden.</p>";
+    el.innerHTML =
+      '<div class="badge ' + t.cls + '">' + t.icon + " " + t.label + "</div>" +
+      '<div class="status-text">' +
+        "<p><b>Jetzt, " + fmt(m) + " Uhr</b> · bis " + endText + " (noch " + fmtDur(endMin - m) + ")</p>" +
+        extra +
+        "<p>" + budgetText + "</p>" +
+      "</div>";
+  }
+
+  function renderPlan(day, m) {
+    const ul = document.getElementById("plan");
+    ul.innerHTML = "";
+    const cur = currentInfo(day, m).idx;
+    day.segments.forEach((s, i) => {
+      if (i === 0) return; // Nacht bis 06:30 steckt im letzten Eintrag
+      const t = TYPES[s.type];
+      const li = document.createElement("li");
+      if (i === cur || (cur === 0 && i === day.segments.length - 1)) li.className = "current";
+      const to = i === day.segments.length - 1 ? "06:30" : fmt(s.to);
+      li.innerHTML =
+        '<i class="' + t.cls + '"></i>' +
+        '<span class="time">' + fmt(s.from) + " – " + to + "</span>" +
+        "<span>" + t.label + (inBudget(day, s) ? '<span class="tag">Kontingent</span>' : "") + "</span>";
+      ul.appendChild(li);
+    });
+  }
+
+  function renderWeek() {
+    const box = document.getElementById("week");
+    box.innerHTML = "";
+    [1, 2, 3, 4, 5, 6, 0].forEach(d => {
+      const isToday = d === dow;
+      const day = isToday
+        ? buildDay(state.school, state.tomorrow, state.lessons)
+        : buildDay(defaultSchoolToday(d), defaultSchoolTomorrow(d), lessonsFor(d));
+      const row = document.createElement("div");
+      row.className = "week-row" + (isToday ? " today" : "");
+      const name = document.createElement("span");
+      name.className = "day";
+      name.textContent = DAY_SHORT[d];
+      row.appendChild(name);
+      row.appendChild(renderBar(day, { mini: true, labels: false, brackets: false }));
+      const info = document.createElement("div");
+      info.className = "info";
+      info.textContent = (day.school
+        ? "Schule bis " + fmt(day.schoolEnd) + " (" + day.lessons + " Std.) · 1,5 h"
+        : "schulfrei · 2 h") + " · Nachtruhe ab " + fmt(day.night);
+      row.appendChild(info);
+      box.appendChild(row);
+    });
+  }
+
+  function renderControls() {
+    document.getElementById("dateline").textContent =
+      DAY_NAMES[dow] + ", " + now.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
+    const st = document.getElementById("schoolToday");
+    const sm = document.getElementById("schoolTomorrow");
+    st.checked = state.school;
+    sm.checked = state.tomorrow;
+    const seg = document.getElementById("lessons");
+    seg.innerHTML = "";
+    Object.keys(LESSON_END).forEach(k => {
+      const n = Number(k);
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(n === state.lessons));
+      b.disabled = !state.school;
+      b.textContent = n;
+      b.title = "Schulschluss " + fmt(LESSON_END[n]);
+      b.addEventListener("click", () => { state.lessons = n; saveState(); render(); });
+      seg.appendChild(b);
+    });
+  }
+
+  function render() {
+    const m = now.getHours() * 60 + now.getMinutes();
+    const day = buildDay(state.school, state.tomorrow, state.lessons);
+    renderControls();
+    renderStatus(day, m);
+    const box = document.getElementById("today");
+    box.innerHTML = "";
+    box.appendChild(renderBar(day, { nowMin: m }));
+    const lbl = box.querySelector(".mlbl.l");
+    if (lbl && lbl.offsetLeft < 0) {
+      lbl.className = "mlbl r low";
+      lbl.style.right = "";
+      lbl.style.left = pct(day.schoolEnd);
+      lbl.insertBefore(lbl.querySelector("i"), lbl.firstChild);
+      lbl.parentElement.classList.add("tall");
+    }
+    box.querySelectorAll(".zone").forEach(z => {
+      const sp = z.firstElementChild;
+      if (!sp) return;
+      const fs = parseFloat(getComputedStyle(z).fontSize);
+      if (z.scrollWidth > z.clientWidth + 1 || sp.offsetHeight > fs * 2.5) z.textContent = "";
+    });
+    renderPlan(day, m);
+    renderWeek();
+  }
+
+  document.getElementById("schoolToday").addEventListener("change", e => { state.school = e.target.checked; saveState(); render(); });
+  document.getElementById("schoolTomorrow").addEventListener("change", e => { state.tomorrow = e.target.checked; saveState(); render(); });
+  document.getElementById("reset").addEventListener("click", () => { remove("sr-day-" + today); loadState(); render(); });
+
+  // Tabs
+  const tabs = document.querySelectorAll(".tabs button");
+  function showTab(name) {
+    tabs.forEach(b => {
+      const on = b.dataset.tab === name;
+      b.setAttribute("aria-selected", String(on));
+      document.getElementById("tab-" + b.dataset.tab).hidden = !on;
+    });
+  }
+  tabs.forEach(b => b.addEventListener("click", () => {
+    showTab(b.dataset.tab);
+    try { history.replaceState(null, "", "#" + b.dataset.tab); } catch (e) {}
+  }));
+  const initial = location.hash.slice(1);
+  showTab(document.getElementById("tab-" + initial) ? initial : "jetzt");
+
+  loadState();
+  render();
+  setInterval(() => {
+    const prev = today;
+    now = new Date();
+    if (isoDate(now) !== prev) loadState();
+    render();
+  }, 30000);
+})();
+</script>
+</body>
+</html>
