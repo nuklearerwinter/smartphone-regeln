@@ -75,6 +75,8 @@
     margin-bottom: 16px;
   }
 
+  .version { margin-top: 24px; text-align: center; font-size: .75rem; color: var(--muted); }
+
   /* Tabs */
   .tabs {
     display: flex; gap: 4px; margin-bottom: 16px; padding: 4px;
@@ -322,6 +324,7 @@
     <div class="callout warn">⚠️ Folgen bei Regelmissachtung: bis zu 1 Woche Handy gesperrt</div>
   </section>
   </div>
+  <footer class="version">Version <span class="js-app-version">dev</span></footer>
 </main>
 
 <script>
@@ -638,6 +641,10 @@
   }));
   const initial = location.hash.slice(1);
   showTab(document.getElementById("tab-" + initial) ? initial : "jetzt");
+
+  // Versionsstempel (wird beim Deploy per sed ersetzt, lokal "dev")
+  const APP_VERSION = (() => { const v = "__APP_VERSION__"; return v[0] === "_" ? "dev" : v; })();
+  for (const el of document.querySelectorAll(".js-app-version")) el.textContent = APP_VERSION;
 
   // Offline-Unterstützung (nur wenn über http/https ausgeliefert)
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

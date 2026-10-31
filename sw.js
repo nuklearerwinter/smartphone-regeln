@@ -1,5 +1,5 @@
 // Network-first: immer zuerst die aktuelle Version laden, offline auf den Cache zurückfallen.
-const CACHE = "smartphone-regeln-v1";
+const CACHE = "smartphone-regeln-__APP_VERSION__"; // beim Deploy gestempelt
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon.svg"];
 
 self.addEventListener("install", e => {
