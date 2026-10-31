@@ -158,34 +158,46 @@
     transform: skewX(-18deg); pointer-events: none;
   }
   .bar.mini + .break { top: -3px; bottom: -3px; border-width: 1.5px; }
-  .school-mark {
-    position: absolute; top: -4px; bottom: -4px; width: 0; margin-left: -1px;
-    border-left: 2px dashed var(--fg); pointer-events: none;
-  }
-  .mark-row { position: relative; height: 24px; margin-top: 6px; font-size: .75rem; font-weight: 600; }
+  .mark-row { position: relative; height: 24px; margin-top: 12px; font-size: .75rem; font-weight: 600; }
   .mark-row.tall { height: 42px; }
-  .mlbl { position: absolute; top: 0; display: flex; align-items: flex-end; gap: 4px; white-space: nowrap; }
-  .mlbl span { line-height: 1; margin-bottom: -5px; }
-  .mlbl.l { margin-right: -1px; }
-  .mlbl.r { margin-left: -1px; }
-  .mlbl i { position: relative; width: 12px; height: 16px; border-bottom: 2px solid var(--fg); flex: none; }
-  .mlbl.l i { border-right: 2px solid var(--fg); border-bottom-right-radius: 3px; }
-  .mlbl.r i { border-left: 2px solid var(--fg); border-bottom-left-radius: 3px; }
+  .mlbl { position: absolute; top: 0; z-index: 1; display: flex; align-items: flex-end; gap: 2px; white-space: nowrap; }
+  .mlbl span { line-height: 1; margin-bottom: -6px; background: var(--card); padding: 1px 3px; }
+  .mlbl.l { margin-right: -.75px; }
+  .mlbl.r { margin-left: -.75px; }
+  .mlbl i { position: relative; width: 12px; height: 16px; border-bottom: 1.5px solid var(--fg); flex: none; }
+  .mlbl.l i { border-right: 1.5px solid var(--fg); border-bottom-right-radius: 3px; }
+  .mlbl.r i { border-left: 1.5px solid var(--fg); border-bottom-left-radius: 3px; }
   .mlbl.low i { height: 34px; }
   .mlbl i::after {
-    content: ""; position: absolute; top: -6px;
-    border: 5px solid transparent; border-top: none; border-bottom: 7px solid var(--fg);
+    content: ""; position: absolute; top: -5px;
+    border: 4px solid transparent; border-top: none; border-bottom: 6px solid var(--fg);
   }
-  .mlbl.l i::after { right: -6px; }
-  .mlbl.r i::after { left: -6px; }
+  .mlbl.l i::after { right: -4.75px; }
+  .mlbl.r i::after { left: -4.75px; }
   .axis { position: relative; height: 20px; margin-top: 4px; font-size: .72rem; color: var(--muted); }
   .axis span { position: absolute; transform: translateX(-50%); }
   .axis span:last-child { transform: translateX(-100%); }
+  /* Hilfslinien von den Uhrzeiten hoch bis zum Balken */
+  .axis span::before {
+    content: ""; position: absolute; left: 50%; bottom: 100%;
+    height: 4px; border-left: 1px dashed var(--muted); opacity: .7;
+  }
+  .axis span:last-child::before { left: 100%; }
+  .mark-row + .axis span::before { height: 40px; }
+  .mark-row.tall + .axis span::before { height: 58px; }
 
   .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; font-size: .85rem; }
   .legend i, .plan i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; }
 
-  .plan { list-style: none; padding: 0; margin: 16px 0 0; }
+  .plan-box { margin-top: 14px; }
+  .plan-box summary {
+    cursor: pointer; color: var(--accent); font-weight: 600; font-size: .9rem;
+    list-style: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .plan-box summary::-webkit-details-marker { display: none; }
+  .plan-box summary::before { content: "▸"; transition: transform .15s; }
+  .plan-box[open] summary::before { transform: rotate(90deg); }
+  .plan { list-style: none; padding: 0; margin: 10px 0 0; }
   .plan li {
     display: grid; grid-template-columns: 22px 118px 1fr; gap: 6px; align-items: baseline;
     padding: 7px 10px; border-radius: 8px;
@@ -256,7 +268,10 @@
       <span><i class="z-blocked"></i>Kein Handy</span>
       <span><i class="z-night"></i>Nachtruhe (nur Telefonieren)</span>
     </div>
-    <ul class="plan" id="plan"></ul>
+    <details class="plan-box">
+      <summary>Uhrzeiten anzeigen</summary>
+      <ul class="plan" id="plan"></ul>
+    </details>
   </section>
 
   <section class="card">
@@ -447,12 +462,6 @@
     br.style.width = span(CUT_FROM, CUT_TO);
     br.title = "01:00–06:00 ausgelassen";
     barWrap.appendChild(br);
-    if (!mini && day.school) {
-      const sm = document.createElement("div");
-      sm.className = "school-mark";
-      sm.style.left = pct(day.schoolEnd);
-      barWrap.appendChild(sm);
-    }
     if (nowMin !== null) {
       const n = document.createElement("div");
       n.className = "now";
@@ -604,6 +613,10 @@
 
   document.getElementById("schoolToday").addEventListener("change", e => { state.school = e.target.checked; saveState(); render(); });
   document.getElementById("schoolTomorrow").addEventListener("change", e => { state.tomorrow = e.target.checked; saveState(); render(); });
+  const planBox = document.querySelector(".plan-box");
+  planBox.addEventListener("toggle", () => {
+    planBox.querySelector("summary").textContent = planBox.open ? "Uhrzeiten ausblenden" : "Uhrzeiten anzeigen";
+  });
   document.getElementById("reset").addEventListener("click", () => { remove("sr-day-" + today); loadState(); render(); });
 
   // Tabs
