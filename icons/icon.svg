@@ -3,6 +3,7 @@
     <clipPath id="bar"><rect x="96" y="212" width="320" height="88" rx="22"/></clipPath>
   </defs>
   <rect width="512" height="512" fill="#12151c"/>
+  <g transform="translate(256 256) scale(1.2) translate(-256 -256)">
   <g clip-path="url(#bar)">
     <rect x="96" y="212" width="120" height="88" fill="#f0b429"/>
     <rect x="216" y="212" width="40" height="88" fill="#3bb26d"/>
@@ -12,4 +13,5 @@
   </g>
   <line x1="288" y1="196" x2="288" y2="320" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
   <polygon points="270,170 306,170 288,194" fill="#ffffff"/>
+  </g>
 </svg>

@@ -65,7 +65,8 @@
     line-height: 1.45;
   }
   main { max-width: 860px; margin: 0 auto; padding: 20px 16px 48px; }
-  h1 { font-size: 1.6rem; margin: 0 0 2px; }
+  h1 { font-size: 1.6rem; margin: 0 0 2px; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 1.5em; height: 1.5em; border-radius: 22%; flex: none; }
   h2 { font-size: 1.1rem; margin: 0 0 14px; }
   .sub { color: var(--muted); margin: 0 0 18px; }
   .card {
@@ -260,7 +261,7 @@
 </head>
 <body>
 <main>
-  <h1>📱 Smartphone-Regeln</h1>
+  <h1><img class="logo" src="icons/icon.svg" alt="">Smartphone-Regeln</h1>
   <p class="sub" id="dateline"></p>
 
   <div class="update" id="update" hidden>
