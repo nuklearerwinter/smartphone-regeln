@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Smartphone-Regeln</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#3b6fe0">
 <style>
   :root {
     --bg: #f4f5f8;
@@ -634,6 +638,11 @@
   }));
   const initial = location.hash.slice(1);
   showTab(document.getElementById("tab-" + initial) ? initial : "jetzt");
+
+  // Offline-Unterstützung (nur wenn über http/https ausgeliefert)
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
 
   loadState();
   render();
