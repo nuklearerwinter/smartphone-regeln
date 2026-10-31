@@ -270,20 +270,16 @@
   </div>
 
   <nav class="tabs" role="tablist">
-    <button role="tab" type="button" data-tab="jetzt">Jetzt</button>
     <button role="tab" type="button" data-tab="heute">Heute</button>
     <button role="tab" type="button" data-tab="woche">Woche</button>
     <button role="tab" type="button" data-tab="regeln">Regeln</button>
   </nav>
 
-  <div role="tabpanel" id="tab-jetzt">
+  <div role="tabpanel" id="tab-heute">
   <section class="card" aria-live="polite">
     <div class="status" id="status"></div>
   </section>
 
-  </div>
-
-  <div role="tabpanel" id="tab-heute">
   <section class="card">
     <div class="timeline" id="today"></div>
     <div class="legend">
@@ -671,7 +667,7 @@
     try { history.replaceState(null, "", "#" + b.dataset.tab); } catch (e) {}
   }));
   const initial = location.hash.slice(1);
-  showTab(document.getElementById("tab-" + initial) ? initial : "jetzt");
+  showTab(document.getElementById("tab-" + initial) ? initial : "heute");
 
   // Versionsstempel (wird beim Deploy per sed ersetzt, lokal "dev")
   const APP_VERSION = (() => { const v = "__APP_VERSION__"; return v[0] === "_" ? "dev" : v; })();
