@@ -1,4 +1,5 @@
 // Network-first: immer zuerst die aktuelle Version laden, offline auf den Cache zurückfallen.
+// cache: "no-cache" fragt beim Server nach (ETag), statt den 10-min-HTTP-Cache von GitHub Pages zu nutzen.
 const CACHE = "smartphone-regeln-__APP_VERSION__"; // beim Deploy gestempelt
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon.svg"];
 
@@ -14,8 +15,9 @@ self.addEventListener("activate", e => {
 });
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
+  if (new URL(e.request.url).pathname.endsWith("/version.json")) return; // nie cachen
   e.respondWith(
-    fetch(e.request)
+    fetch(new Request(e.request, { cache: "no-cache" }))
       .then(res => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));

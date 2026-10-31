@@ -22,7 +22,7 @@ jobs:
         run: |
           VER="$(git log -1 --format=%cd --date=short) · $(git rev-parse --short HEAD)"
           echo "Stamping APP_VERSION: $VER"
-          sed -i "s|__APP_VERSION__|$VER|g" index.html sw.js
+          sed -i "s|__APP_VERSION__|$VER|g" index.html sw.js version.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
