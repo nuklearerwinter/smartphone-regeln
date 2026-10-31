@@ -104,7 +104,8 @@
   [role="tabpanel"][hidden] { display: none; }
 
   /* Status */
-  .status { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .status { display: flex; flex-direction: column; gap: 12px; }
+  .status .badge { width: 100%; box-sizing: border-box; justify-content: center; text-align: center; }
   .badge {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 10px 14px; border-radius: 10px;
@@ -546,7 +547,7 @@
     let extra = "";
     if (seg.type === "blocked") extra = "<p>Ab 18:00 darf der Rest des Kontingents genutzt werden.</p>";
     el.innerHTML =
-      '<div class="badge ' + t.cls + '">' + t.icon + " " + t.label + "</div>" +
+      '<div class="badge ' + t.cls + '">' + t.label + "</div>" +
       '<div class="status-text">' +
         "<p><b>Jetzt, " + fmt(m) + " Uhr</b> · bis " + endText + " (noch " + fmtDur(endMin - m) + ")</p>" +
         extra +
