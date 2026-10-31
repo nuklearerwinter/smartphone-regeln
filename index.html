@@ -353,6 +353,18 @@
   function load(key) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
   function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
   function remove(key) { try { localStorage.removeItem(key); } catch (e) {} }
+  // Alte Einträge entfernen: Tageseinstellungen anderer Tage und das nicht mehr
+  // genutzte Schulstunden-Format pro Wochentag (sr-lessons-*).
+  function cleanup(keepKey) {
+    try {
+      const old = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && ((k.startsWith("sr-day-") && k !== keepKey) || k.startsWith("sr-lessons-"))) old.push(k);
+      }
+      old.forEach(k => localStorage.removeItem(k));
+    } catch (e) {}
+  }
 
   // ---------- Hilfsfunktionen ----------
   const pad = n => String(n).padStart(2, "0");
@@ -410,6 +422,7 @@
     now = new Date();
     dow = now.getDay();
     today = isoDate(now);
+    cleanup("sr-day-" + today);
     const stored = load("sr-day-" + today);
     state = {
       school: stored ? stored.school : defaultSchoolToday(dow),
