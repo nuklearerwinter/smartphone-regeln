@@ -209,6 +209,8 @@
     height: 4px; border-left: 1px dashed var(--muted); opacity: .7;
   }
   .axis span:last-child::before { left: 100%; }
+  .bar-wrap + .axis { margin-top: 7px; }
+  .bar-wrap + .axis span::before { height: 7px; }
   .mark-row + .axis span::before { height: 40px; }
   .mark-row.tall + .axis span::before { height: 58px; }
 
@@ -257,7 +259,11 @@
     .card { padding: 14px; }
     h1 { font-size: 1.4rem; }
     .badge { font-size: 1.1rem; }
-    .zone { font-size: .7rem; }
+    .zone { font-size: .82rem; }
+    .bar:not(.mini) { height: 60px; }
+    .axis { font-size: .82rem; height: 22px; }
+    .mark-row { font-size: .82rem; }
+    .bracket span { font-size: .8rem; }
     .plan li { grid-template-columns: 22px 92px 1fr; padding: 6px 4px; }
     .controls { gap: 10px 20px; }
     .ctl { flex-wrap: wrap; }
