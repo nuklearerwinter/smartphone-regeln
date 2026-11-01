@@ -79,17 +79,6 @@
 
   .version { margin-top: 24px; text-align: center; font-size: .75rem; color: var(--muted); }
 
-  .update {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    margin-bottom: 12px; padding: 10px 14px; border-radius: 12px;
-    background: var(--accent); color: var(--on-accent); font-weight: 600;
-  }
-  .update[hidden] { display: none; }
-  .update button {
-    border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer;
-    font: inherit; background: var(--on-accent); color: var(--accent);
-  }
-
   /* Tabs */
   .tabs {
     display: flex; gap: 4px; margin-bottom: 16px; padding: 4px;
@@ -276,11 +265,6 @@
 <main>
   <h1><img class="logo" src="icons/icon.svg" alt="">Smartphone-Regeln</h1>
   <p class="sub" id="dateline"></p>
-
-  <div class="update" id="update" hidden>
-    <span>Neue Version verfügbar</span>
-    <button type="button" id="updateBtn">Aktualisieren</button>
-  </div>
 
   <nav class="tabs" role="tablist">
     <button role="tab" type="button" data-tab="heute">Heute</button>
@@ -712,7 +696,7 @@
   const APP_VERSION = (() => { const v = "__APP_VERSION__"; return v[0] === "_" ? "dev" : v; })();
   for (const el of document.querySelectorAll(".js-app-version")) el.textContent = APP_VERSION;
 
-  // Neue-Version-Erkennung: version.json am Cache vorbei laden und vergleichen
+  // Neue-Version-Erkennung: version.json am Cache vorbei laden, bei neuer Version direkt neu laden
   let lastCheck = 0;
   function checkVersion() {
     if (APP_VERSION === "dev" || !location.protocol.startsWith("http")) return;
@@ -722,12 +706,17 @@
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d && d.version && d.version[0] !== "_" && d.version !== APP_VERSION) {
-          document.getElementById("update").hidden = false;
+          // Schutz vor Endlos-Neuladen: pro neuer Version nur einmal automatisch neu laden,
+          // falls der Server kurzzeitig noch die alte Seite ausliefert.
+          let tried = null;
+          try { tried = sessionStorage.getItem("sr-reload-for"); } catch (e) {}
+          if (tried === d.version) return;
+          try { sessionStorage.setItem("sr-reload-for", d.version); } catch (e) {}
+          location.reload();
         }
       })
       .catch(() => {});
   }
-  document.getElementById("updateBtn").addEventListener("click", () => location.reload());
   checkVersion();
   setInterval(checkVersion, 15 * 60000);
 
